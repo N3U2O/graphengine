@@ -95,6 +95,7 @@ void SystemClass::Shutdown()
 	// Release the OpenGL object.
 	if(m_OpenGL)
 	{
+		m_OpenGL->Shutdown(m_hwnd);
 		delete m_OpenGL;
 		m_OpenGL = 0;
 	}
@@ -203,6 +204,7 @@ bool SystemClass::InitializeWindows(OpenGLClass* OpenGL, int& screenWidth, int& 
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
 	int posX, posY;
+	bool result;
 
 
 	// Get an external pointer to this object.	
@@ -241,6 +243,14 @@ bool SystemClass::InitializeWindows(OpenGLClass* OpenGL, int& screenWidth, int& 
 
 	// Don't show the window.
 	ShowWindow(m_hwnd, SW_HIDE);
+
+	// Initialize a temporary OpenGL window and load the OpenGL extensions.
+	result = OpenGL->InitializeExtensions(m_hwnd);
+	if(!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the OpenGL extensions.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Release the temporary window now that the extensions have been initialized.
 	DestroyWindow(m_hwnd);
@@ -283,6 +293,14 @@ bool SystemClass::InitializeWindows(OpenGLClass* OpenGL, int& screenWidth, int& 
 						    posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
 	if(m_hwnd == NULL)
 	{
+		return false;
+	}
+
+	// Initialize OpenGL now that the window has been created.
+	result = m_OpenGL->InitializeOpenGL(m_hwnd, screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR, VSYNC_ENABLED);
+	if(!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize OpenGL, check if video card supports OpenGL 4.0.", L"Error", MB_OK);
 		return false;
 	}
 

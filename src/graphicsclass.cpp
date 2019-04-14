@@ -6,6 +6,7 @@
 
 GraphicsClass::GraphicsClass()
 {
+	m_OpenGL = 0;
 }
 
 
@@ -21,6 +22,8 @@ GraphicsClass::~GraphicsClass()
 
 bool GraphicsClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 {
+	// Store a pointer to the OpenGL class object.
+	m_OpenGL = OpenGL;
 
 	return true;
 }
@@ -28,6 +31,8 @@ bool GraphicsClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+	// Release the pointer to the OpenGL class object.
+	m_OpenGL = 0;
 
 	return;
 }
@@ -35,6 +40,15 @@ void GraphicsClass::Shutdown()
 
 bool GraphicsClass::Frame()
 {
+	bool result;
+
+
+	// Render the graphics scene.
+	result = Render();
+	if(!result)
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -42,6 +56,12 @@ bool GraphicsClass::Frame()
 
 bool GraphicsClass::Render()
 {
+	// Clear the buffers to begin the scene.
+	m_OpenGL->BeginScene(0.5f, 0.5f, 0.5f, 1.0f);
+
+
+	// Present the rendered scene to the screen.
+	m_OpenGL->EndScene();
 
 	return true;
 }
